@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import './ProfileEdit.css';
 
 export function ProfileEdit() {
-  const { user, refreshUser } = useAuth();
+  const { refreshUser } = useAuth();
   const [avatarId, setAvatarId] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);

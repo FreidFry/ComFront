@@ -92,27 +92,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Преобразует AuthInitDTO в минимальный CommonUserDataDTO для совместимости
-  const createUserFromInit = (initData: AuthInitDTO): CommonUserDataDTO | null => {
-    // Проверяем, что есть хотя бы userName (id может быть null)
-    if (!initData.userName) {
-      if (import.meta.env.DEV) {
-        console.warn('Cannot create user from init data: userName is missing', initData);
-      }
-      return null;
-    }
-    
-    // Создаем минимальный объект пользователя
-    return {
-      userName: initData.userName,
-      avatarTumbnailUrl: '', // Будет загружено позже, если нужно
-      createdAt: '', // Будет загружено позже, если нужно
-      homePage: '', // Будет загружено позже, если нужно
-      lastActive: null,
-      threads: [], // Будет загружено позже, если нужно
-    };
-  };
-
   const checkAuth = async () => {
     try {
       if (import.meta.env.DEV) {

@@ -16,7 +16,7 @@ export default defineConfig({
         secure: false, // Отключаем проверку SSL для самоподписанных сертификатов (HTTPS)
         rewrite: (path) => path, // Не переписываем путь
         configure: (proxy, _options) => {
-          proxy.on('proxyRes', (proxyRes, req, res) => {
+          proxy.on('proxyRes', (proxyRes) => {
             // Логируем Set-Cookie заголовки для отладки
             const raw = proxyRes.headers['set-cookie'];
 const cookies: string[] =
@@ -56,7 +56,7 @@ proxyRes.headers['set-cookie'] = modifiedCookies;
         changeOrigin: true,
         secure: false, // Для самоподписанных сертификатов
         // Проксируем только API запросы, не SPA роуты
-        bypass: (req, res, options) => {
+        bypass: (req) => {
           const acceptHeader = req.headers.accept || '';
           // Если это запрос от браузера для страницы (text/html), не проксируем
           // Запрос обработается React Router
@@ -75,7 +75,7 @@ proxyRes.headers['set-cookie'] = modifiedCookies;
         changeOrigin: true,
         secure: false, // Для самоподписанных сертификатов
         // Проксируем только API запросы, не SPA роуты
-        bypass: (req, res, options) => {
+        bypass: (req) => {
           const acceptHeader = req.headers.accept || '';
           // Если это запрос от браузера для страницы (text/html), не проксируем
           // Запрос обработается React Router
@@ -94,7 +94,7 @@ proxyRes.headers['set-cookie'] = modifiedCookies;
         changeOrigin: true,
         secure: false, // Для самоподписанных сертификатов
         // Проксируем только API запросы, не SPA роуты
-        bypass: (req, res, options) => {
+        bypass: (req) => {
           const acceptHeader = req.headers.accept || '';
           // Если это запрос от браузера для страницы (text/html), не проксируем
           // Запрос обработается React Router

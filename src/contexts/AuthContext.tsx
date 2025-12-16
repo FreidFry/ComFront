@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import type { ReactNode } from "react";
 import { apiService } from '../services/api';
-import type { CommonUserDataDTO, AuthInitDTO } from '../types/api';
+import type { CommonUserDataDTO } from '../types/api';
 
 interface AuthContextType {
   user: CommonUserDataDTO | null;

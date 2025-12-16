@@ -3,7 +3,6 @@ import { apiService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import type { CommentTreeDTO } from '../../types/api';
 import { formatDate } from '../../utils/dateFormat';
-import { CommentForm } from './CommentForm';
 import './CommentItem.css';
 
 interface CommentItemProps {
@@ -34,7 +33,6 @@ export function CommentItem({
   const [error, setError] = useState<string | null>(null);
 
   const canEdit = isAuthenticated && user && user.userName === comment.userName;
-  const canDelete = canEdit;
 
   const handleUpdate = async () => {
     if (content.trim() === '') {

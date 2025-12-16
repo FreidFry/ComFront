@@ -1,0 +1,33 @@
+.comment-tree {
+  width: 100%;
+}
+
+.comments-list {
+  margin-top: 2rem;
+}
+
+.comment-wrapper {
+  margin-bottom: 1rem;
+}
+
+.comment-replies {
+  margin-left: 2rem;
+  margin-top: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid #ecf0f1;
+}
+
+.reply-form-container {
+  margin: 1rem 0 1rem 2rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.no-comments {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+  font-style: italic;
+}
+

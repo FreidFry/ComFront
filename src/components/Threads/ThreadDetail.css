@@ -1,0 +1,130 @@
+.thread-detail {
+  width: 100%;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.thread-article {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.thread-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.thread-header h1 {
+  margin: 0;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.thread-actions {
+  margin-left: 1rem;
+}
+
+.edit-button {
+  padding: 0.5rem 1rem;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+}
+
+.edit-button:hover {
+  background-color: #2980b9;
+}
+
+.thread-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: #7f8c8d;
+  flex-wrap: wrap;
+}
+
+.thread-author {
+  font-weight: 500;
+}
+
+.thread-content {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  color: #34495e;
+}
+
+.thread-content p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.thread-stats {
+  padding-top: 1rem;
+  border-top: 1px solid #ecf0f1;
+  color: #95a5a6;
+  font-size: 0.875rem;
+}
+
+.comments-section {
+  background: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comments-section h2 {
+  margin: 0 0 1.5rem 0;
+  color: #2c3e50;
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+}
+
+.login-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.login-link:hover {
+  background-color: #2980b9;
+}
+
+.loading,
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #7f8c8d;
+}
+
+.error {
+  color: #e74c3c;
+}
+

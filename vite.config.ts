@@ -18,63 +18,34 @@ export default defineConfig({
         configure: (proxy, _options) => {
           proxy.on('proxyRes', (proxyRes, req, res) => {
             // Логируем Set-Cookie заголовки для отладки
-            const setCookieHeaders = proxyRes.headers['set-cookie'];
-            if (setCookieHeaders) {
-              console.log('[Vite Proxy] Set-Cookie headers received:', setCookieHeaders);
-              
-              // Переписываем cookies для работы с локальным прокси
-              // Важно: если SameSite=None, то Secure обязателен
-              // Для локальной разработки на HTTP меняем SameSite=None на SameSite=Lax
-              const modifiedCookies = Array.isArray(setCookieHeaders) 
-                ? setCookieHeaders.map(cookie => {
-                    let modified = cookie;
-                    
-                    // Если есть SameSite=None, меняем на Lax (для HTTP разработки)
-                    // Или оставляем None, но добавляем Secure (для HTTPS)
-                    if (modified.includes('SameSite=None')) {
-                      // Для локальной разработки на HTTP меняем на Lax
-                      modified = modified.replace(/;\s*SameSite=None/gi, '; SameSite=Lax');
-                      // Убираем Secure, так как для Lax он не нужен на HTTP
-                      modified = modified.replace(/;\s*Secure/gi, '');
-                    } else if (modified.includes('SameSite=')) {
-                      // Если SameSite уже установлен (но не None), оставляем как есть
-                    } else {
-                      // Если SameSite не установлен, добавляем Lax
-                      modified += '; SameSite=Lax';
-                    }
-                    
-                    // Переписываем domain на пустую строку (текущий домен)
-                    modified = modified.replace(/;\s*Domain=[^;]+/gi, '');
-                    
-                    // Убеждаемся, что Path установлен
-                    if (!modified.includes('Path=')) {
-                      modified += '; Path=/';
-                    }
-                    
-                    return modified;
-                  })
-                : [setCookieHeaders].map(cookie => {
-                    let modified = cookie;
-                    
-                    if (modified.includes('SameSite=None')) {
-                      modified = modified.replace(/;\s*SameSite=None/gi, '; SameSite=Lax');
-                      modified = modified.replace(/;\s*Secure/gi, '');
-                    } else if (!modified.includes('SameSite=')) {
-                      modified += '; SameSite=Lax';
-                    }
-                    
-                    modified = modified.replace(/;\s*Domain=[^;]+/gi, '');
-                    
-                    if (!modified.includes('Path=')) {
-                      modified += '; Path=/';
-                    }
-                    
-                    return modified;
-                  });
-              
-              proxyRes.headers['set-cookie'] = modifiedCookies;
-              console.log('[Vite Proxy] Set-Cookie headers modified:', modifiedCookies);
-            }
+            const raw = proxyRes.headers['set-cookie'];
+const cookies: string[] =
+  typeof raw === 'string'
+    ? [raw]
+    : Array.isArray(raw)
+      ? raw
+      : [];
+      const modifiedCookies = cookies.map((cookie: string) => {
+  let modified = cookie;
+
+  if (modified.includes('SameSite=None')) {
+    modified = modified.replace(/;\s*SameSite=None/gi, '; SameSite=Lax');
+    modified = modified.replace(/;\s*Secure/gi, '');
+  } else if (!modified.includes('SameSite=')) {
+    modified += '; SameSite=Lax';
+  }
+
+  modified = modified.replace(/;\s*Domain=[^;]+/gi, '');
+
+  if (!modified.includes('Path=')) {
+    modified += '; Path=/';
+  }
+
+  return modified;
+});
+
+proxyRes.headers['set-cookie'] = modifiedCookies;
+
           });
         },
       },

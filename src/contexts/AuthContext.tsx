@@ -92,98 +92,123 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const checkAuth = async () => {
-    try {
-      if (import.meta.env.DEV) {
-        console.log('🔍 Checking authentication...');
-      }
+  // const checkAuth = async () => {
+  //   try {
+  //     if (import.meta.env.DEV) {
+  //       console.log('🔍 Checking authentication...');
+  //     }
       
-      // Используем /api/auth/init/ только для проверки статуса (200 = аутентифицирован, 401 = не аутентифицирован)
-      let isAuthenticated = false;
-      try {
-        await apiService.init();
-        // Если init вернул 200 OK (даже с пустым телом), значит пользователь аутентифицирован
-        isAuthenticated = true;
-        if (import.meta.env.DEV) {
-          console.log('✅ Init returned 200 - user is authenticated');
-        }
-      } catch (error: any) {
-        const status = error.response?.status;
-        if (status === 401) {
-          // 401 означает, что пользователь не аутентифицирован
-          isAuthenticated = false;
-          if (import.meta.env.DEV) {
-            console.log('❌ Init returned 401 - user not authenticated');
-          }
-        } else {
-          // Другие ошибки - логируем, но не считаем это признаком неаутентификации
-          if (import.meta.env.DEV) {
-            console.warn('Init returned error, but will try to read from cookies:', error.message);
-          }
-          // Пробуем прочитать из cookies на всякий случай
-          isAuthenticated = true;
-        }
-      }
+  //     // Используем /api/auth/init/ только для проверки статуса (200 = аутентифицирован, 401 = не аутентифицирован)
+  //     let isAuthenticated = false;
+  //     try {
+  //       await apiService.init();
+  //       // Если init вернул 200 OK (даже с пустым телом), значит пользователь аутентифицирован
+  //       isAuthenticated = true;
+  //       if (import.meta.env.DEV) {
+  //         console.log('✅ Init returned 200 - user is authenticated');
+  //       }
+  //     } catch (error: any) {
+  //       const status = error.response?.status;
+  //       if (status === 401) {
+  //         // 401 означает, что пользователь не аутентифицирован
+  //         isAuthenticated = false;
+  //         if (import.meta.env.DEV) {
+  //           console.log('❌ Init returned 401 - user not authenticated');
+  //         }
+  //       } else {
+  //         // Другие ошибки - логируем, но не считаем это признаком неаутентификации
+  //         if (import.meta.env.DEV) {
+  //           console.warn('Init returned error, but will try to read from cookies:', error.message);
+  //         }
+  //         // Пробуем прочитать из cookies на всякий случай
+  //         isAuthenticated = true;
+  //       }
+  //     }
       
-      // Данные пользователя всегда читаем из cookies
-      const user = getUserFromCookies();
-      const currentUserId = getUserIdFromCookies();
+  //     // Данные пользователя всегда читаем из cookies
+  //     const user = getUserFromCookies();
+  //     const currentUserId = getUserIdFromCookies();
       
-      // Обновляем userId
-      setUserId(currentUserId);
+  //     // Обновляем userId
+  //     setUserId(currentUserId);
       
-      if (user && isAuthenticated) {
-        setUser(user);
-        if (import.meta.env.DEV) {
-          console.log('✅ Authentication successful, user:', user.userName);
-        }
-      } else {
-        setUser(null);
-        if (import.meta.env.DEV) {
-          if (!isAuthenticated) {
-            console.log('❌ User not authenticated (401 from init)');
-          } else if (!user) {
-            console.log('❌ No user data found in cookies');
-          }
-        }
-      }
-    } catch (error: any) {
-      const status = error.response?.status;
-      if (import.meta.env.DEV) {
-        console.log('❌ Auth check result:', {
-          status,
-          message: error.message,
-          data: error.response?.data,
-          // Проверяем, были ли отправлены cookies в запросе
-          requestUrl: error.config?.url,
-          withCredentials: error.config?.withCredentials,
-        });
+  //     if (user && isAuthenticated) {
+  //       setUser(user);
+  //       if (import.meta.env.DEV) {
+  //         console.log('✅ Authentication successful, user:', user.userName);
+  //       }
+  //     } else {
+  //       setUser(null);
+  //       if (import.meta.env.DEV) {
+  //         if (!isAuthenticated) {
+  //           console.log('❌ User not authenticated (401 from init)');
+  //         } else if (!user) {
+  //           console.log('❌ No user data found in cookies');
+  //         }
+  //       }
+  //     }
+  //   } catch (error: any) {
+  //     const status = error.response?.status;
+  //     if (import.meta.env.DEV) {
+  //       console.log('❌ Auth check result:', {
+  //         status,
+  //         message: error.message,
+  //         data: error.response?.data,
+  //         // Проверяем, были ли отправлены cookies в запросе
+  //         requestUrl: error.config?.url,
+  //         withCredentials: error.config?.withCredentials,
+  //       });
         
-        // Если 401, возможно cookies не были отправлены
-        if (status === 401) {
-          console.warn('⚠️ 401 Unauthorized - possible reasons:');
-          console.warn('  1. JWT cookie not set by server');
-          console.warn('  2. JWT cookie not sent by browser (check CORS, SameSite, Secure flags)');
-          console.warn('  3. JWT token expired or invalid');
-          console.warn('  4. Server not reading cookie correctly');
-        }
-      }
+  //       // Если 401, возможно cookies не были отправлены
+  //       if (status === 401) {
+  //         console.warn('⚠️ 401 Unauthorized - possible reasons:');
+  //         console.warn('  1. JWT cookie not set by server');
+  //         console.warn('  2. JWT cookie not sent by browser (check CORS, SameSite, Secure flags)');
+  //         console.warn('  3. JWT token expired or invalid');
+  //         console.warn('  4. Server not reading cookie correctly');
+  //       }
+  //     }
       
-      // Если ошибка 401, значит пользователь не аутентифицирован
-      if (status === 401) {
-        setUser(null);
-        if (import.meta.env.DEV) {
-          console.log('User not authenticated (401)');
-        }
-      } else {
-        // Другие ошибки - логируем, но не сбрасываем пользователя
-        console.error('Ошибка проверки аутентификации:', error);
-        // Не сбрасываем user при других ошибках, чтобы не потерять состояние
-      }
-    } finally {
-      setIsLoading(false);
+  //     // Если ошибка 401, значит пользователь не аутентифицирован
+  //     if (status === 401) {
+  //       setUser(null);
+  //       if (import.meta.env.DEV) {
+  //         console.log('User not authenticated (401)');
+  //       }
+  //     } else {
+  //       // Другие ошибки - логируем, но не сбрасываем пользователя
+  //       console.error('Ошибка проверки аутентификации:', error);
+  //       // Не сбрасываем user при других ошибках, чтобы не потерять состояние
+  //     }
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const checkAuth = async () => {
+  try {
+    setIsLoading(true);
+    if (import.meta.env.DEV) console.log('🔍 Checking authentication...');
+
+    // Запрашиваем данные. Если 401 — упадет в catch.
+    const response = await apiService.init(); 
+    
+    // response.data теперь содержит объект с userName, id и т.д.
+    const userData = response.data;
+
+    if (userData && userData.userName) {
+      setUser(userData);
+      setUserId(userData.id);
+      if (import.meta.env.DEV) console.log('✅ Auth success:', userData.userName);
     }
-  };
+  } catch (error: any) {
+    setUser(null);
+    setUserId(null);
+    if (import.meta.env.DEV) console.warn('❌ Not authenticated');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   useEffect(() => {
     checkAuth();
@@ -191,20 +216,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
   // Периодически проверяем аутентификацию, если пользователь не загружен
   // Это помогает, если cookies установились позже
-  useEffect(() => {
-    if (user || isLoading) {
-      return; // Пользователь загружен или идет загрузка, не проверяем
-    }
+  // useEffect(() => {
+  //   if (user || isLoading) {
+  //     return; // Пользователь загружен или идет загрузка, не проверяем
+  //   }
     
-    const interval = setInterval(() => {
-      if (import.meta.env.DEV) {
-        console.log('Periodic auth check - user not loaded, retrying...');
-      }
-      checkAuth();
-    }, 3000); // Проверяем каждые 3 секунды
+  //   const interval = setInterval(() => {
+  //     if (import.meta.env.DEV) {
+  //       console.log('Periodic auth check - user not loaded, retrying...');
+  //     }
+  //     checkAuth();
+  //   }, 3000); // Проверяем каждые 3 секунды
     
-    return () => clearInterval(interval);
-  }, [user, isLoading]);
+  //   return () => clearInterval(interval);
+  // }, [user, isLoading]);
 
   const login = async (email: string, password: string) => {
     try {

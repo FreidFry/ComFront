@@ -114,6 +114,9 @@ export function CommentItem({
       </div>
       <div className="comment-content">
         <p>{comment.content}</p>
+        {comment.imageUrl != null && (
+          <img src={comment.imageUrl} alt="Comment image" />
+        )}
         {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
           <span className="comment-updated">(отредактировано)</span>
         )}

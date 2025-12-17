@@ -33,6 +33,7 @@ export interface CommentCreateDTO {
 export interface CommentUpdateDTO {
   commentId: string;
   content: string;
+  imageUrl?: string | null;
 }
 
 export interface UserUpdateAvatarDTO {
@@ -72,6 +73,7 @@ export interface CommentResponseDTO {
   parentCommentId?: string | null;
   userId: string;
   userName: string;
+  imageUrl?: string | null;
   avatarTumbnailUrl?: string | null;
 }
 

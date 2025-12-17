@@ -15,49 +15,41 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const STORAGE_KEY = 'auth_user'; // Ключ для LocalStorage
+
+// ... (остальной импорт без изменений)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Инициализируем состояние сразу из LocalStorage, чтобы избежать "мерцания" UI
   const [user, setUser] = useState<CommonUserDataDTO | null>(() => {
-    const savedUser = localStorage.getItem(STORAGE_KEY);
-    return savedUser ? JSON.parse(savedUser) : null;
+    const saved = localStorage.getItem('auth_user');
+    return saved ? JSON.parse(saved) : null;
   });
-  
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(user?.id || null);
-
-  // Хелпер для сохранения данных
-  const saveUserData = (userData: CommonUserDataDTO) => {
-    setUser(userData);
-    setUserId(userData.id || null);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
-  };
-
-  // Хелпер для очистки данных
-  const clearUserData = () => {
-    setUser(null);
-    setUserId(null);
-    localStorage.removeItem(STORAGE_KEY);
-  };
 
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      if (import.meta.env.DEV) console.log('🔍 Checking authentication...');
+      const authData = await apiService.init(); 
 
-      const response = await apiService.init(); 
-      const userData = response.data;
-
-      if (userData && userData.userName) {
-        saveUserData(userData);
-        if (import.meta.env.DEV) console.log('✅ Auth success, saved to storage');
+      if (authData && authData.id && authData.userName) {
+        const userData: CommonUserDataDTO = {
+          id: authData.id,
+          userName: authData.userName,
+          avatarTumbnailUrl: '', 
+          createdAt: '',
+          homePage: '',
+          threads: [],
+        };
+        setUser(userData);
+        setUserId(userData.id);
+        localStorage.setItem('auth_user', JSON.stringify(userData));
       } else {
-        clearUserData();
+        throw new Error('Not authenticated');
       }
-    } catch (error: any) {
-      clearUserData();
-      if (import.meta.env.DEV) console.warn('❌ Not authenticated or server error');
+    } catch (error) {
+      setUser(null);
+      setUserId(null);
+      localStorage.removeItem('auth_user');
     } finally {
       setIsLoading(false);
     }
@@ -67,25 +59,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
+  // --- ОБЪЯВЛЕНИЕ ФУНКЦИЙ (Initializer) ---
+
   const login = async (email: string, password: string) => {
-    try {
-      const loginResponse = await apiService.login({ email, password });
-      
-      // Если бэк возвращает данные пользователя в loginResponse.data, используем их
-      // Если нет — вызываем checkAuth для получения данных из /init
-      if (loginResponse.data && loginResponse.data.userName) {
-        saveUserData(loginResponse.data);
-      } else {
-        await checkAuth();
-      }
-      
-    } catch (error: any) {
-      clearUserData();
-      throw error;
-    }
+    await apiService.login({ email, password });
+    await checkAuth();
   };
 
-  const register = async (data: any) => {
+  const register = async (data: {
+    userName: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    homePage?: string | null;
+  }) => {
     await apiService.register(data);
     await checkAuth();
   };
@@ -94,8 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await apiService.logout();
     } finally {
-      // Очищаем локальные данные в любом случае
-      clearUserData();
+      setUser(null);
+      setUserId(null);
+      localStorage.removeItem('auth_user');
     }
   };
 
@@ -103,9 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await checkAuth();
   };
 
-  const isAuthenticated = useMemo(() => {
-    return !!user;
-  }, [user]);
+  const isAuthenticated = useMemo(() => !!user, [user]);
 
   return (
     <AuthContext.Provider
@@ -114,10 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAuthenticated,
         userId,
-        login,
-        register,
-        logout,
-        refreshUser,
+        login,        // Теперь инициализатор существует
+        register,     // Теперь инициализатор существует
+        logout,       // Теперь инициализатор существует
+        refreshUser,  // Теперь инициализатор существует
       }}
     >
       {children}

@@ -80,6 +80,7 @@ export interface CommentTreeDTO extends CommentResponseDTO {
 }
 
 export interface CommonUserDataDTO {
+  id: string;
   userName: string;
   avatarTumbnailUrl: string;
   createdAt: string;

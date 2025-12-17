@@ -113,7 +113,7 @@ export function CommentItem({
         <span className="comment-date">{formatDate(comment.createdAt)}</span>
       </div>
       <div className="comment-content">
-        <p>{comment.content}</p>
+        <p dangerouslySetInnerHTML={{ __html: comment.content }} />
         {comment.imageUrl != null && (
           <img src={comment.imageUrl} alt="Comment image" />
         )}

@@ -74,7 +74,7 @@ export function ThreadDetail() {
         </div>
 
         <div className="thread-content">
-          <p>{thread.context}</p>
+          <p dangerouslySetInnerHTML={{ __html: thread.context }} />
         </div>
 
         <div className="thread-stats">

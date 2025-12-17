@@ -82,7 +82,7 @@ export function ThreadList() {
                 className="thread-card"
               >
                 <h3>{thread.title}</h3>
-                <p className="thread-content">{thread.content}</p>
+                <p className="thread-content" dangerouslySetInnerHTML={{ __html: thread.content }} />
                 <div className="thread-meta">
                   <span className="thread-date">{formatDate(thread.createdAt)}</span>
                   <span className="thread-comments">

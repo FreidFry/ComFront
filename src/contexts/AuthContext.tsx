@@ -16,40 +16,51 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ... (остальной импорт без изменений)
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<CommonUserDataDTO | null>(() => {
     const saved = localStorage.getItem('auth_user');
-    return saved ? JSON.parse(saved) : null;
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
   });
+
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(user?.id || null);
+
+  // Вспомогательная функция для сохранения данных пользователя
+  const saveUserData = (data: any) => {
+    if (data && data.id) {
+      const userData: CommonUserDataDTO = {
+        id: data.id,
+        userName: data.userName || 'User',
+        avatarTumbnailUrl: data.avatarTumbnailUrl || '',
+        createdAt: data.createdAt || '',
+        homePage: data.homePage || '',
+        threads: data.threads || [],
+      };
+      setUser(userData);
+      setUserId(userData.id);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
+      return userData;
+    }
+    return null;
+  };
 
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      const authData = await apiService.init(); 
-
-      if (authData && authData.id && authData.userName) {
-        const userData: CommonUserDataDTO = {
-          id: authData.id,
-          userName: authData.userName,
-          avatarTumbnailUrl: '', 
-          createdAt: '',
-          homePage: '',
-          threads: [],
-        };
-        setUser(userData);
-        setUserId(userData.id);
-        localStorage.setItem('auth_user', JSON.stringify(userData));
-      } else {
-        throw new Error('Not authenticated');
-      }
+      const response = await apiService.init(); 
+      
+      // Если init вернул объект с данными (не пустую строку)
+      if (response && typeof response === 'object' && response.id) {
+        saveUserData(response);
+      } 
+      // Если ответ пустой (как в твоих логах), мы не очищаем localStorage,
+      // чтобы сохранить сессию, если куки валидны
     } catch (error) {
-      setUser(null);
-      setUserId(null);
-      localStorage.removeItem('auth_user');
+      console.warn("Session check failed or inactive");
     } finally {
       setIsLoading(false);
     }
@@ -59,21 +70,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  // --- ОБЪЯВЛЕНИЕ ФУНКЦИЙ (Initializer) ---
+  // --- ФУНКЦИИ ДЕЙСТВИЙ ---
 
   const login = async (email: string, password: string) => {
-    await apiService.login({ email, password });
-    await checkAuth();
+    // В твоих логах Login API возвращает объект пользователя в response.data
+    const response = await apiService.login({ email, password });
+    
+    // Сохраняем данные СРАЗУ из ответа логина
+    const userData = saveUserData(response);
+    
+    // Если в ответе логина вдруг нет данных, пробуем дернуть init
+    if (!userData) {
+      await checkAuth();
+    }
   };
 
-  const register = async (data: {
-    userName: string;
-    email: string;
-    password: string;
-    confirmPassword: string;
-    homePage?: string | null;
-  }) => {
-    await apiService.register(data);
+  const register = async (data: any) => {
+    const response = await apiService.register(data);
+    // Если регистрация сразу логинит пользователя и возвращает данные:
+    saveUserData(response);
     await checkAuth();
   };
 
@@ -100,10 +115,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAuthenticated,
         userId,
-        login,        // Теперь инициализатор существует
-        register,     // Теперь инициализатор существует
-        logout,       // Теперь инициализатор существует
-        refreshUser,  // Теперь инициализатор существует
+        login,
+        register,
+        logout,
+        refreshUser,
       }}
     >
       {children}

@@ -119,15 +119,10 @@ export function CommentItem({
         )}
         {comment.fileUrl && (
           <div className="comment-file">
-            <a 
-              href={comment.fileUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              download
-              className="download-file-link"
-            >
-              <span className="file-icon">📄</span> Скачать прикрепленный файл
-            </a>
+            <p>К комментарию прикреплен файл:</p>
+            <button onClick={() => window.open(comment.fileUrl ?? undefined, '_blank')}>
+              Открыть прикрепленный файл
+            </button>
           </div>
         )}
         {comment.updatedAt && comment.updatedAt !== comment.createdAt && (

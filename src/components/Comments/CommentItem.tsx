@@ -31,6 +31,9 @@ export function CommentItem({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Состояние для попапа с картинкой
+  const [isImageOpen, setIsImageOpen] = useState(false);
 
   const canEdit = isAuthenticated && user && user.userName === comment.userName;
 
@@ -39,10 +42,8 @@ export function CommentItem({
       setError('Комментарий не может быть пустым');
       return;
     }
-
     setIsUpdating(true);
     setError(null);
-
     try {
       await apiService.updateComment(comment.id, {
         commentId: comment.id,
@@ -57,10 +58,7 @@ export function CommentItem({
   };
 
   const handleDelete = async () => {
-    if (!confirm('Вы уверены, что хотите удалить этот комментарий?')) {
-      return;
-    }
-
+    if (!confirm('Вы уверены, что хотите удалить этот комментарий?')) return;
     setIsDeleting(true);
     try {
       await apiService.deleteComment(comment.id);
@@ -82,11 +80,7 @@ export function CommentItem({
         />
         {error && <div className="error-message">{error}</div>}
         <div className="comment-edit-actions">
-          <button
-            onClick={handleUpdate}
-            disabled={isUpdating || content.trim() === ''}
-            className="save-button"
-          >
+          <button onClick={handleUpdate} disabled={isUpdating || content.trim() === ''} className="save-button">
             {isUpdating ? 'Сохранение...' : 'Сохранить'}
           </button>
           <button onClick={onCancelEdit} disabled={isUpdating} className="cancel-button">
@@ -102,21 +96,28 @@ export function CommentItem({
       <div className="comment-header">
         <div className="comment-author">
           {comment.avatarTumbnailUrl && (
-            <img
-              src={comment.avatarTumbnailUrl}
-              alt={comment.userName}
-              className="comment-avatar"
-            />
+            <img src={comment.avatarTumbnailUrl} alt={comment.userName} className="comment-avatar" />
           )}
           <span className="comment-username">{comment.userName}</span>
         </div>
         <span className="comment-date">{formatDate(comment.createdAt)}</span>
       </div>
+
       <div className="comment-content">
-        <p dangerouslySetInnerHTML={{ __html: comment.content }} />
+        <div dangerouslySetInnerHTML={{ __html: comment.content }} />
+        
+        {/* Миниатюра с кликом для открытия */}
         {comment.imageTumbnailUrl != null && (
-          <img src={comment.imageTumbnailUrl} alt="Comment image" />
+          <div className="comment-image-wrapper">
+            <img 
+              src={comment.imageTumbnailUrl} 
+              alt="Comment image" 
+              className="comment-image-preview"
+              onClick={() => setIsImageOpen(true)} 
+            />
+          </div>
         )}
+
         {comment.fileUrl && (
           <div className="comment-file">
             <p>К комментарию прикреплен файл:</p>
@@ -125,25 +126,19 @@ export function CommentItem({
             </button>
           </div>
         )}
+
         {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
           <span className="comment-updated">(отредактировано)</span>
         )}
       </div>
+
       {isAuthenticated && (
         <div className="comment-actions">
-          <button onClick={onReply} className="reply-button">
-            Ответить
-          </button>
+          <button onClick={onReply} className="reply-button">Ответить</button>
           {canEdit && (
             <>
-              <button onClick={onEdit} className="edit-button">
-                Редактировать
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isDeleting}
-                className="delete-button"
-              >
+              <button onClick={onEdit} className="edit-button">Редактировать</button>
+              <button onClick={handleDelete} disabled={isDeleting} className="delete-button">
                 {isDeleting ? 'Удаление...' : 'Удалить'}
               </button>
             </>
@@ -151,7 +146,20 @@ export function CommentItem({
         </div>
       )}
       {error && <div className="error-message">{error}</div>}
+
+      {/* --- POPUP (MODAL) --- */}
+      {isImageOpen && (
+        <div className="image-popup-overlay" onClick={() => setIsImageOpen(false)}>
+          <div className="image-popup-content" onClick={(e) => e.stopPropagation()}>
+            <button className="image-popup-close" onClick={() => setIsImageOpen(false)}>&times;</button>
+            <img 
+              src={comment.imageUrl || comment.imageTumbnailUrl || ''} 
+              alt="Full size" 
+              className="image-popup-full" 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-

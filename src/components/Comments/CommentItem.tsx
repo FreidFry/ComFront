@@ -117,6 +117,19 @@ export function CommentItem({
         {comment.imageUrl != null && (
           <img src={comment.imageUrl} alt="Comment image" />
         )}
+        {comment.fileUrl && (
+          <div className="comment-file">
+            <a 
+              href={comment.fileUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              download
+              className="download-file-link"
+            >
+              <span className="file-icon">📄</span> Скачать прикрепленный файл
+            </a>
+          </div>
+        )}
         {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
           <span className="comment-updated">(отредактировано)</span>
         )}

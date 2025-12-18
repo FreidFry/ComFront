@@ -82,7 +82,39 @@ export function CommentForm({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
-    setFile(selectedFile ?? null);
+    const MAX_TEXT_FILE_SIZE = 100 * 1024; // 100 KB
+
+    if (selectedFile) {
+      const isImage = selectedFile.type.startsWith('image/');
+      const isText = selectedFile.type === 'text/plain';
+
+      // 1. Если это текстовый файл, проверяем размер
+      if (isText) {
+        if (selectedFile.size > MAX_TEXT_FILE_SIZE) {
+          setError('Текстовый файл слишком большой. Максимальный размер — 100 КБ');
+          resetFileInput();
+          return;
+        }
+      } 
+      // 2. Если это не картинка и не текст (на случай обхода accept)
+      else if (!isImage) {
+        setError('Можно прикреплять только изображения или текстовые файлы');
+        resetFileInput();
+        return;
+      }
+
+      // Если дошли сюда — всё ок (картинка или маленький текст)
+      setError(null);
+      setFile(selectedFile);
+    }
+  };
+
+  // Вспомогательная функция для очистки
+  const resetFileInput = () => {
+    setFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const handleRemoveFile = () => {
@@ -108,7 +140,7 @@ export function CommentForm({
           <span>Прикрепить файл (изображение или текст)</span>
           <input
             type="file"
-            accept="image/*,text/plain"
+            accept="image/gif,image/jpeg,image/png,text/plain"
             onChange={handleFileChange}
             disabled={isLoading}
             ref={fileInputRef}

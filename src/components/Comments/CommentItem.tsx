@@ -114,8 +114,8 @@ export function CommentItem({
       </div>
       <div className="comment-content">
         <p dangerouslySetInnerHTML={{ __html: comment.content }} />
-        {comment.imageUrl != null && (
-          <img src={comment.imageUrl} alt="Comment image" />
+        {comment.imageTumbnailUrl != null && (
+          <img src={comment.imageTumbnailUrl} alt="Comment image" />
         )}
         {comment.fileUrl && (
           <div className="comment-file">

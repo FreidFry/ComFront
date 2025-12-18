@@ -74,6 +74,7 @@ export interface CommentResponseDTO {
   userId: string;
   userName: string;
   imageUrl?: string | null;
+  fileUrl?: string | null;
   avatarTumbnailUrl?: string | null;
 }
 

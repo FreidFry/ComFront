@@ -1,13 +1,50 @@
 .comment-tree {
   width: 100%;
+  box-sizing: border-box;
 }
 
-.comments-list {
-  margin-top: 2rem;
+/* Кнопки сортировки */
+.sort-panel {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 20px 0;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
 }
 
-.comment-wrapper {
-  margin-bottom: 1rem;
+.sort-label { font-size: 13px; font-weight: bold; color: #555; }
+
+.sort-panel button {
+  padding: 5px 15px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.sort-panel button.active {
+  background: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+/* Таблица на всю ширину */
+.comments-main-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.comment-table-cell {
+  width: 100%;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.comment-branch {
+  width: 100%;
 }
 
 .comment-replies {
@@ -17,17 +54,93 @@
   border-left: 2px solid #ecf0f1;
 }
 
-.reply-form-container {
-  margin: 1rem 0 1rem 2rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 4px;
+/* Почта в строке */
+.comment-email-inline {
+  font-size: 12px;
+  color: #95a5a6;
+  margin-left: 8px;
+  font-weight: normal;
 }
 
 .no-comments {
   text-align: center;
   padding: 2rem;
   color: #7f8c8d;
-  font-style: italic;
 }
 
+
+.replies-control {
+  margin: 5px 0 10px 0;
+}
+
+.toggle-replies-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.toggle-replies-btn:hover {
+  background: rgba(52, 152, 219, 0.1);
+  text-decoration: underline;
+}
+
+.comment-replies {
+  margin-left: 20px; /* Отступ для вложенности */
+  border-left: 2px solid #f0f0f0;
+  padding-left: 10px;
+}
+
+/* Растягивание таблицы */
+.comments-table-compact {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.content-cell {
+  width: 100%;
+}
+
+
+.pagination-controls {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+.load-more-btn, .hide-replies-btn {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.load-more-btn {
+  color: #27ae60;
+}
+
+.load-more-btn:hover {
+  background: rgba(39, 174, 96, 0.1);
+}
+
+.hide-replies-btn {
+  color: #e74c3c;
+}
+
+.hide-replies-btn:hover {
+  background: rgba(231, 76, 60, 0.1);
+}
+
+/* Ограничение смещения для глубоких веток */
+.comment-replies {
+  transition: all 0.3s ease;
+}

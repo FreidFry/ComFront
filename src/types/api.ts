@@ -73,6 +73,7 @@ export interface CommentResponseDTO {
   parentCommentId?: string | null;
   userId: string;
   userName: string;
+  email: string;
   imageUrl?: string | null;
   imageTumbnailUrl?: string | null;
   fileUrl?: string | null;
@@ -81,6 +82,18 @@ export interface CommentResponseDTO {
 
 export interface CommentTreeDTO extends CommentResponseDTO {
   replies: CommentTreeDTO[];
+}
+
+export interface CommentTreeProps {
+  // ID треда, к которому относятся комментарии (нужен для отправки новых постов)
+  threadId: string; 
+
+  // Массив всех комментариев, которые мы получили от бэкенда (из API)
+  comments: CommentResponseDTO[]; 
+
+  // Опциональная функция (callback), которую можно вызвать, 
+  // если родительскому компоненту нужно знать, что добавился новый коммент
+  onCommentAdded?: () => void; 
 }
 
 export interface CommonUserDataDTO {

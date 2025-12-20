@@ -7,6 +7,7 @@ import './CommentItem.css';
 
 interface CommentItemProps {
   comment: CommentTreeDTO;
+  depth: number;
   isEditing: boolean;
   onReply: () => void;
   onEdit: () => void;

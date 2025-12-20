@@ -15,6 +15,7 @@ import type {
   CommonUserDataDTO,
   AuthInitDTO,
   ApiError,
+  PaginatedCommentsDTO,
 } from '../types/api';
 import { buildApiUrl } from '../config/api';
 
@@ -353,20 +354,39 @@ class ApiService {
     return response.data;
   }
 
-  async getThreadComments(
-    threadId: string,
-    after?: Date | null,
-    limit: number = 50
-  ): Promise<CommentResponseDTO[]> {
-    const params: Record<string, string | number> = { limit };
-    if (after) {
-      params.after = after.toISOString();
-    }
-    const response = await this.client.get<CommentResponseDTO[]>(
-      buildApiUrl(`/threads/${threadId}/comments/`, params)
-    );
-    return response.data;
+async getThreadComments(
+  threadId: string,
+  after?: string | Date | null,
+  limit: number = 25
+): Promise<PaginatedCommentsDTO> { // Мы всё еще хотим возвращать массив для удобства компонента
+  const params: any = { limit };
+  if (after) {
+    params.after = after instanceof Date ? after.toISOString() : after;
   }
+
+  const response = await this.client.get<PaginatedCommentsDTO>(
+    buildApiUrl(`/threads/${threadId}/Comments`),
+    { params }
+  );
+
+  // ВАЖНО: Достаем items из объекта пагинации
+  const data = response.data;
+  
+  if (data && Array.isArray(data.items)) {
+    return data;
+  }
+  
+  // Если бэкенд вдруг вернет просто массив (на будущее)
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  return {
+    items: [],
+    nextCursor: null,
+    hasMore: false
+  };;
+}
 
   // Comment endpoints
   async getComment(commentId: string): Promise<CommentResponseDTO> {

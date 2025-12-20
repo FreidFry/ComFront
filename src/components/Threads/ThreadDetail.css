@@ -1,24 +1,36 @@
-.thread-detail {
-  width: 100%;
+/* Основной контейнер */
+.thread-detail-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* Навигация */
+.detail-nav {
+  margin-bottom: 1.5rem;
 }
 
 .back-link {
-  display: inline-block;
-  margin-bottom: 1.5rem;
-  color: #3498db;
   text-decoration: none;
-  font-weight: 500;
+  color: #666;
+  font-size: 0.95rem;
+  transition: color 0.2s;
 }
 
 .back-link:hover {
-  text-decoration: underline;
+  color: #007bff;
 }
 
-.thread-article {
-  background: white;
+/* Основная статья треда */
+.thread-main {
+  background: #fff;
+  border: 1px solid #e1e4e8;
   border-radius: 8px;
   padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   margin-bottom: 2rem;
 }
 
@@ -26,105 +38,136 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 1rem;
   margin-bottom: 1rem;
 }
 
 .thread-header h1 {
   margin: 0;
-  color: #2c3e50;
-  flex: 1;
+  font-size: 2rem;
+  color: #1a1a1a;
+  line-height: 1.2;
 }
 
-.thread-actions {
-  margin-left: 1rem;
-}
-
-.edit-button {
-  padding: 0.5rem 1rem;
-  background-color: #3498db;
-  color: white;
+.edit-link {
+  flex-shrink: 0;
   text-decoration: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  transition: background-color 0.2s;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: #333;
+  font-size: 0.9rem;
+  transition: all 0.2s;
 }
 
-.edit-button:hover {
-  background-color: #2980b9;
+.edit-link:hover {
+  background: #eee;
+  border-color: #ccc;
 }
 
-.thread-meta {
+/* Инфо об авторе и дате */
+.thread-info {
   display: flex;
-  gap: 1rem;
+  gap: 15px;
+  font-size: 0.9rem;
+  color: #666;
   margin-bottom: 1.5rem;
-  font-size: 0.875rem;
-  color: #7f8c8d;
-  flex-wrap: wrap;
 }
 
-.thread-author {
-  font-weight: 500;
+.author-tag strong {
+  color: #333;
 }
 
-.thread-content {
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
-  color: #34495e;
+.divider {
+  border: 0;
+  border-top: 1px solid #eee;
+  margin: 1.5rem 0;
 }
 
-.thread-content p {
-  margin: 0;
-  white-space: pre-wrap;
+/* Тело сообщения */
+.thread-body {
+  font-size: 1.1rem;
+  word-wrap: break-word;
 }
 
-.thread-stats {
-  padding-top: 1rem;
-  border-top: 1px solid #ecf0f1;
-  color: #95a5a6;
-  font-size: 0.875rem;
-}
-
+/* Секция комментариев */
 .comments-section {
-  background: white;
+  margin-top: 3rem;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.comments-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.comments-count {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+/* Напоминание об авторизации */
+.auth-reminder {
+  background: #fdf6ec;
+  border: 1px solid #faecd8;
+  padding: 1.5rem;
   border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.comments-section h2 {
-  margin: 0 0 1.5rem 0;
-  color: #2c3e50;
-}
-
-.login-prompt {
   text-align: center;
-  padding: 2rem;
-  color: #7f8c8d;
+  margin-top: 2rem;
 }
 
-.login-link {
+.auth-reminder p {
+  margin-bottom: 1rem;
+  color: #8a6d3b;
+}
+
+.login-button {
   display: inline-block;
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  background-color: #3498db;
+  background: #007bff;
   color: white;
   text-decoration: none;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.2s;
 }
 
-.login-link:hover {
-  background-color: #2980b9;
+.login-button:hover {
+  background: #0056b3;
 }
 
-.loading,
-.error {
+/* Состояния загрузки и ошибки */
+.loading-state, .error-state {
   text-align: center;
-  padding: 2rem;
-  color: #7f8c8d;
+  padding: 4rem;
+  font-size: 1.2rem;
+  color: #666;
 }
 
-.error {
-  color: #e74c3c;
+.error-state {
+  color: #dc3545;
 }
 
+/* Адаптивность */
+@media (max-width: 600px) {
+  .thread-header {
+    flex-direction: column;
+  }
+  
+  .thread-main {
+    padding: 1.5rem;
+  }
+  
+  .thread-header h1 {
+    font-size: 1.5rem;
+  }
+}

@@ -80,6 +80,12 @@ export interface CommentResponseDTO {
   avatarTumbnailUrl?: string | null;
 }
 
+export interface PaginatedCommentsDTO {
+  items: CommentResponseDTO[];
+  nextCursor: string | null; // Это дата последнего комментария
+  hasMore: boolean;
+}
+
 export interface CommentTreeDTO extends CommentResponseDTO {
   replies: CommentTreeDTO[];
 }
@@ -89,7 +95,7 @@ export interface CommentTreeProps {
   threadId: string; 
 
   // Массив всех комментариев, которые мы получили от бэкенда (из API)
-  comments: CommentResponseDTO[]; 
+  comments: PaginatedCommentsDTO[]; 
 
   // Опциональная функция (callback), которую можно вызвать, 
   // если родительскому компоненту нужно знать, что добавился новый коммент

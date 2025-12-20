@@ -34,7 +34,7 @@ export function ThreadDetail() {
       // Важно: getThreadComments теперь возвращает массив через apiService (как мы правили ранее)
       const [threadData, commentsArray] = await Promise.all([
         apiService.getThread(id),
-        apiService.getThreadComments(id)
+        apiService.getThreadComments(id, 'createat', false)
       ]);
 
       setThread(threadData);

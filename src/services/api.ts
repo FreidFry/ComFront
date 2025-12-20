@@ -356,10 +356,20 @@ class ApiService {
 
 async getThreadComments(
   threadId: string,
+  sortBy: string,
+  isAscending: boolean,
   after?: string | Date | null,
-  limit: number = 25
-): Promise<PaginatedCommentsDTO> { // Мы всё еще хотим возвращать массив для удобства компонента
-  const params: any = { limit };
+  limit: number = 25,
+): Promise<PaginatedCommentsDTO> {
+  
+  // Добавляем все параметры в объект, который пойдет в Query String
+  const params: any = { 
+    threadId,    // Должно совпадать с именем в C# DTO
+    sortBy, 
+    isAscending, 
+    limit 
+  };
+
   if (after) {
     params.after = after instanceof Date ? after.toISOString() : after;
   }

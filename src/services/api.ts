@@ -16,6 +16,7 @@ import type {
   AuthInitDTO,
   ApiError,
   PaginatedCommentsDTO,
+  CommentTreeDTO,
 } from '../types/api';
 import { buildApiUrl } from '../config/api';
 
@@ -347,6 +348,11 @@ class ApiService {
     return response.data;
   }
 
+  async getCaptcha(): Promise<{ id: string; imageBase64: string }> {
+    const response = await axios.get('/api/captcha/generate');
+    return response.data;
+  }
+
   async restoreThread(threadId: string): Promise<{ message: string }> {
     const response = await this.client.put(
       buildApiUrl('/threads/', { id: threadId })
@@ -364,9 +370,9 @@ async getThreadComments(
   
   // Добавляем все параметры в объект, который пойдет в Query String
   const params: any = { 
-    threadId,    // Должно совпадать с именем в C# DTO
-    sortBy, 
+    sortBy,
     isAscending, 
+    after,
     limit 
   };
 
@@ -398,6 +404,43 @@ async getThreadComments(
   };;
 }
 
+async getCommentReplies(commentId: string, after?: string | null): Promise<CommentTreeDTO[]> {
+  const params = {
+    CommentId: commentId,
+    After: after || null
+  };
+
+  try {
+    const response = await this.client.get<PaginatedCommentsDTO>(
+      buildApiUrl('/comments/replyes/'), 
+      { params }
+    );
+
+    // Извлекаем массив items из объекта пагинации
+    if (response.data && Array.isArray(response.data.items)) {
+      return response.data.items as CommentTreeDTO[];
+    }
+    return [];
+  } catch (error) {
+    console.error("Ошибка при загрузке ответов:", error);
+    return [];
+  }
+}
+
+async getCommentRepliesRaw(commentId: string, after?: string | null): Promise<PaginatedCommentsDTO> {
+  const params = {
+    CommentId: commentId,
+    After: after || null,
+  };
+
+  const response = await this.client.get<PaginatedCommentsDTO>(
+    buildApiUrl('/comments/replyes/'), 
+    { params }
+  );
+
+  return response.data;
+}
+
   // Comment endpoints
   async getComment(commentId: string): Promise<CommentResponseDTO> {
     const response = await this.client.get<CommentResponseDTO>(
@@ -410,6 +453,8 @@ async getThreadComments(
     const formData = new FormData();
     formData.append('Content', data.content);
     formData.append('ThreadId', data.threadId);
+    formData.append('CaptchaId', data.captchaId);
+    formData.append('CaptchaValue', data.captchaValue);
     if (data.parentCommentId) {
       formData.append('ParentCommentId', data.parentCommentId);
     }
@@ -495,6 +540,8 @@ async getThreadComments(
     );
     return response.data;
   }
+
+  
 
   // Profile endpoints
   async getProfile(userId?: string | null): Promise<CommonUserDataDTO> {

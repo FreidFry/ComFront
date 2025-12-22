@@ -26,6 +26,8 @@ export interface ThreadUpdateDTO {
 export interface CommentCreateDTO {
   content: string;
   threadId: string;
+  captchaId: string;    // ID из Redis
+  captchaValue: string; // То, что ввел юзер
   parentCommentId?: string | null;
   formFile?: File | null;
 }
@@ -60,6 +62,11 @@ export interface ThreadResponseDTO {
   commentCount: number;
 }
 
+export interface CaptchaResponseDTO {
+  id: string;
+  imageBase64: string;
+}
+
 export interface ThreadWithCommentsDTO extends ThreadResponseDTO {
   comments: CommentResponseDTO[];
 }
@@ -78,16 +85,20 @@ export interface CommentResponseDTO {
   imageTumbnailUrl?: string | null;
   fileUrl?: string | null;
   avatarTumbnailUrl?: string | null;
-}
-
-export interface PaginatedCommentsDTO {
-  items: CommentResponseDTO[];
-  nextCursor: string | null; // Это дата последнего комментария
-  hasMore: boolean;
+  // ДОБАВЬ СЮДА:
+  commentCount: number; 
 }
 
 export interface CommentTreeDTO extends CommentResponseDTO {
-  replies: CommentTreeDTO[];
+  // Теперь здесь не нужно дублировать comentCount, он наследуется
+  replies: CommentTreeDTO[]; 
+}
+
+export interface PaginatedCommentsDTO {
+  // Убедись, что здесь используется CommentResponseDTO или CommentTreeDTO
+  items: CommentResponseDTO[];
+  nextCursor: string | null;
+  hasMore: boolean;
 }
 
 export interface CommentTreeProps {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { apiService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import type { CommentTreeDTO } from '../../types/api';
+import type { CommentTreeDTO, PaginatedCommentsDTO } from '../../types/api';
 import { formatDate } from '../../utils/dateFormat';
 import './CommentItem.css';
 
@@ -9,142 +9,126 @@ interface CommentItemProps {
   comment: CommentTreeDTO;
   depth: number;
   isEditing: boolean;
-  onReply: () => void;
-  onEdit: () => void;
+  onReply: (id: string) => void;
+  onEdit: (id: string) => void;
   onCancelEdit: () => void;
   onDeleted: () => void;
   onUpdated: () => void;
 }
 
 export function CommentItem({
-  comment, isEditing, onReply, onEdit, onCancelEdit, onDeleted, onUpdated
+  comment, depth, isEditing, onReply, onEdit, onCancelEdit, onDeleted, onUpdated
 }: CommentItemProps) {
   const { user, isAuthenticated } = useAuth();
-  const [content, setContent] = useState(comment.content);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isImageOpen, setIsImageOpen] = useState(false);
+  
+  const [replies, setReplies] = useState<CommentTreeDTO[]>([]);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
 
   const canEdit = isAuthenticated && user && user.userName === comment.userName;
+  const totalReplies = Number(comment.commentCount || (comment as any).commentCount || 0);
+  const remainingCount = totalReplies - replies.length;
 
-  const handleUpdate = async () => {
-    if (!content.trim()) return;
-    setIsUpdating(true);
-    setError(null);
+  const loadReplies = async (cursor: string | null = null) => {
+    setIsLoading(true);
     try {
-      await apiService.updateComment(comment.id, { commentId: comment.id, content: content.trim() });
-      onUpdated();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Не удалось сохранить изменения');
-    } finally { setIsUpdating(false); }
-  };
-
-  const handleDelete = async () => {
-    if (!confirm('Удалить этот комментарий?')) return;
-    setIsDeleting(true);
-    setError(null);
-    try {
-      await apiService.deleteComment(comment.id);
-      onDeleted();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Не удалось удалить комментарий');
-      setIsDeleting(false);
+      const data: PaginatedCommentsDTO = await apiService.getCommentRepliesRaw(comment.id, cursor);
+      const newItems = data.items
+        .filter(item => item.id !== comment.id)
+        .map(item => ({ ...item, replies: [] }));
+      
+      setReplies(prev => (cursor ? [...prev, ...newItems] : newItems));
+      setNextCursor(data.nextCursor);
+      setHasMore(data.hasMore);
+    } catch (err) {
+      console.error("Load error:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (isEditing) {
-    return (
-      <div className="comment-item editing">
-        <textarea 
-          value={content} 
-          onChange={(e) => setContent(e.target.value)} 
-          className="comment-edit-textarea" 
-          rows={3} 
-        />
-        {error && <div className="comment-error-text">❌ {error}</div>}
-        <div className="comment-edit-actions">
-          <button onClick={handleUpdate} disabled={isUpdating} className="save-button">
-            {isUpdating ? '...' : 'Сохранить'}
-          </button>
-          <button onClick={() => { setError(null); onCancelEdit(); }} className="cancel-button">
-            Отмена
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const handleToggleReplies = () => {
+    if (isExpanded) {
+      setIsExpanded(false);
+    } else {
+      if (replies.length === 0) loadReplies(null);
+      setIsExpanded(true);
+    }
+  };
 
+const handleReplyClick = () => {
+    onReply(comment.id); // Сообщаем родительскому компоненту ID
+    setIsExpanded(true); // Сразу раскрываем ветку
+  };
   return (
-    <div className="comment-item">
-      {/* Кнопки управления в углу (появляются при наведении) */}
-      {isAuthenticated && (
+    <div className="comment-node">
+      {/* КАРТОЧКА КОММЕНТАРИЯ */}
+      <div className="comment-item" style={{ marginLeft: `${depth * 20}px` }}>
         <div className="comment-hover-actions">
-          <button onClick={onReply} className="icon-btn reply-btn" title="Ответить">↩</button>
+          {isAuthenticated && (
+            <button onClick={handleReplyClick} className="icon-btn reply-btn-top">↶</button>
+          )}
           {canEdit && (
             <>
-              <button onClick={onEdit} className="icon-btn edit-btn" title="Редактировать">✎</button>
-              <button onClick={handleDelete} disabled={isDeleting} className="icon-btn delete-btn" title="Удалить">
-                {isDeleting ? '...' : '×'}
-              </button>
+              <button onClick={() => onEdit(comment.id)} className="icon-btn edit-btn">✎</button>
+              <button onClick={onDeleted} className="icon-btn delete-btn">✖</button>
             </>
           )}
         </div>
+
+        <div className="comment-main-body">
+          <div className="comment-header">
+            <span className="comment-username">{comment.userName}</span>
+            <span className="comment-date">{formatDate(comment.createdAt)}</span>
+          </div>
+          <div className="comment-content" dangerouslySetInnerHTML={{ __html: comment.content }} />
+          <div className="comment-footer">
+            {totalReplies > 0 && (
+              <button onClick={handleToggleReplies} className="action-btn">
+                {isExpanded ? '▼ Скрыть' : `▶ Ответы (${totalReplies})`}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ФОРМА ОТВЕТА (Строго здесь: под родителем, над списком детей) */}
+      {isEditing && (
+        <div className="reply-form-mount" style={{ marginLeft: `${(depth + 1) * 20}px` }}>
+          {/* Здесь родительский компонент вставит CommentForm через условие */}
+          <div className="active-form-indicator">Напишите ваш ответ...</div>
+        </div>
       )}
 
-      <div className="comment-header">
-        <div className="comment-author">
-          {comment.avatarTumbnailUrl && (
-            <img src={comment.avatarTumbnailUrl} alt="" className="comment-avatar" />
+      {/* СПИСОК СУЩЕСТВУЮЩИХ ОТВЕТОВ */}
+      {isExpanded && (
+        <div className="comment-replies-wrapper">
+          <div className="replies-list">
+            {replies.map((reply) => (
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                depth={depth + 1}
+                isEditing={false}
+                onReply={onReply}
+                onEdit={onEdit}
+                onCancelEdit={onCancelEdit}
+                onDeleted={onDeleted}
+                onUpdated={onUpdated}
+              />
+            ))}
+          </div>
+
+          {/* КНОПКА ПОКАЗАТЬ ЕЩЕ (в самом низу текущей пачки) */}
+          {hasMore && (
+            <div className="load-more-container" style={{ marginLeft: `${(depth + 1) * 20}px` }}>
+              <button onClick={() => loadReplies(nextCursor)} className="action-btn load-more-btn">
+                {isLoading ? 'Загрузка...' : `Показать еще (${remainingCount})`}
+              </button>
+            </div>
           )}
-          <span className="comment-username">{comment.userName}</span>
-          {comment.email && <span className="comment-email-inline">({comment.email})</span>}
-        </div>
-        <span className="comment-date">{formatDate(comment.createdAt)}</span>
-      </div>
-
-      <div className="comment-content">
-        <div className="text-body" dangerouslySetInnerHTML={{ __html: comment.content }} />
-        
-        {comment.imageTumbnailUrl && (
-          <div className="comment-image-wrapper">
-            <img 
-              src={comment.imageTumbnailUrl} 
-              className="comment-image-preview" 
-              onClick={() => setIsImageOpen(true)} 
-              alt="attached"
-            />
-          </div>
-        )}
-
-        {comment.fileUrl && (
-          <div className="comment-file-box">
-            <button className="file-open-btn" onClick={() => window.open(comment.fileUrl ?? undefined, '_blank')}>
-              📎 Файл
-            </button>
-          </div>
-        )}
-
-        {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
-          <span className="comment-updated-tag">(ред.)</span>
-        )}
-      </div>
-
-      {/* Вывод ошибки в обычном режиме */}
-      {error && (
-        <div className="comment-error-bubble">
-          <span>⚠️ {error}</span>
-          <button className="error-close-btn" onClick={() => setError(null)}>&times;</button>
-        </div>
-      )}
-
-      {/* Попап изображения */}
-      {isImageOpen && (
-        <div className="image-popup-overlay" onClick={() => setIsImageOpen(false)}>
-          <div className="image-popup-content" onClick={(e) => e.stopPropagation()}>
-            <button className="image-popup-close" onClick={() => setIsImageOpen(false)}>&times;</button>
-            <img src={comment.imageUrl || comment.imageTumbnailUrl || ''} className="image-fullsize" alt="" />
-          </div>
         </div>
       )}
     </div>

@@ -1,290 +1,17 @@
-.comment-item {
+.comment-node {
   width: 100%;
-  box-sizing: border-box; /* КРИТИЧНО: чтобы padding не расширял блок сверх 100% */
-  background: white;
-  border: 1px solid #ecf0f1;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  display: block; /* Гарантирует, что элемент ведет себя как блок на всю ширину */
-}
-
-.comment-item.editing {
-  background-color: #f8f9fa;
-}
-
-.comment-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.comment-author {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.comment-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.comment-username {
-  font-weight: 500;
-  color: #2c3e50;
-}
-
-.comment-date {
-  font-size: 0.875rem;
-  color: #95a5a6;
-}
-
-.comment-content {
-  color: #34495e;
-  line-height: 1.6;
-  margin-bottom: 0.75rem;
-}
-
-.comment-content p {
-  margin: 0;
-  white-space: pre-wrap;
-}
-
-.comment-updated {
-  font-size: 0.75rem;
-  color: #95a5a6;
-  font-style: italic;
-}
-
-.comment-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid #ecf0f1;
-}
-
-.reply-button,
-.edit-button,
-.delete-button {
-  padding: 0.25rem 0.75rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.reply-button {
-  background-color: #3498db;
-  color: white;
-}
-
-.reply-button:hover {
-  background-color: #2980b9;
-}
-
-.edit-button {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.edit-button:hover {
-  background-color: #7f8c8d;
-}
-
-.delete-button {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.delete-button:hover {
-  background-color: #c0392b;
-}
-
-.delete-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.comment-edit-textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-family: inherit;
-  resize: vertical;
-  box-sizing: border-box;
-  margin-bottom: 0.75rem;
-}
-
-.comment-edit-textarea:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-}
-
-.comment-edit-actions {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.save-button,
-.cancel-button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.save-button {
-  background-color: #27ae60;
-  color: white;
-}
-
-.save-button:hover:not(:disabled) {
-  background-color: #229954;
-}
-
-.save-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.cancel-button {
-  background-color: #95a5a6;
-  color: white;
-}
-
-.cancel-button:hover:not(:disabled) {
-  background-color: #7f8c8d;
-}
-
-.error-message {
-  margin-top: 0.75rem;
-  padding: 0.5rem;
-  background-color: #fee;
-  color: #c33;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
-
-.comment-file {
-    margin-top: 10px;
-    padding: 8px 12px;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    border: 1px solid #e9ecef;
-    display: inline-block;
-}
-
-.download-file-link {
-    color: #007bff;
-    text-decoration: none;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.download-file-link:hover {
-    text-decoration: underline;
-    color: #0056b3;
-}
-
-.file-icon {
-    font-size: 1.2rem;
+  display: block;
 }
 
 .comment-item {
-  position: relative;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 10px 15px;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  background: #fff;
-  transition: all 0.2s;
-}
-
-.comment-item:hover {
-  background: #fafafa;
-  border-color: #ddd;
-}
-
-/* Кнопки в углу */
-.comment-hover-actions {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  display: flex;
-  gap: 2px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.comment-item:hover .comment-hover-actions {
-  opacity: 1;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  color: #999;
-  font-size: 16px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-btn:hover { background: #eee; color: #444; }
-.delete-btn:hover { color: #d9534f; background: #fff5f5; }
-
-/* Текстовые стили */
-.comment-username { font-weight: bold; font-size: 13px; }
-.comment-email-inline { font-size: 11px; color: #999; margin-left: 5px; }
-.comment-date { font-size: 11px; color: #ccc; float: right; }
-
-/* Пагинация веток */
-.load-more-btn {
-  background: #f8f9fa;
-  border: 1px solid #e9ecef;
-  color: #007bff;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 3px 10px;
-  border-radius: 12px;
-  cursor: pointer;
-  margin: 5px 0;
-}
-
-.replies-indent {
-  border-left: 2px solid #f1f1f1;
-  padding-left: 10px;
-  margin-top: 5px;
-}
-
-/* Основной контейнер */
-.comment-item {
-  position: relative;
-  width: 100%;
+  position: relative; /* Чтобы иконки прилипли к углу этого блока */
   padding: 12px 16px;
   background: #ffffff;
   border: 1px solid #eef0f2;
   border-radius: 8px;
   margin-bottom: 6px;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .comment-item:hover {
@@ -292,14 +19,14 @@
   border-color: #d1d9e0;
 }
 
-/* Кнопки-иконки в углу */
+/* ИКОНКИ В ПРАВОМ ВЕРХНЕМ УГЛУ */
 .comment-hover-actions {
   position: absolute;
   top: 8px;
   right: 8px;
   display: flex;
   gap: 4px;
-  opacity: 0;
+  opacity: 0; /* Скрыты по умолчанию */
   transition: opacity 0.2s;
   background: rgba(255, 255, 255, 0.9);
   padding: 2px;
@@ -307,7 +34,7 @@
 }
 
 .comment-item:hover .comment-hover-actions {
-  opacity: 1;
+  opacity: 1; /* Показываем при наведении на весь коммент */
 }
 
 .icon-btn {
@@ -322,56 +49,104 @@
   cursor: pointer;
   color: #8899a6;
   border-radius: 4px;
-  transition: all 0.2s;
 }
 
 .icon-btn:hover { background: #f0f2f5; color: #1da1f2; }
 .delete-btn:hover { color: #e0245e !important; background: #fff5f8 !important; }
 .edit-btn:hover { color: #f59e0b !important; background: #fffbeb !important; }
 
-/* Сообщения об ошибках */
-.comment-error-text {
-  color: #dc2626;
-  font-size: 12px;
-  margin: 8px 0;
-  font-weight: 500;
-}
-
-.comment-error-bubble {
-  margin-top: 10px;
-  padding: 8px 12px;
-  background: #fef2f2;
-  border: 1px solid #fee2e2;
-  border-radius: 6px;
-  color: #991b1b;
-  font-size: 12px;
+/* ТЕКСТ И ШАПКА */
+.comment-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  margin-bottom: 6px;
+  padding-right: 85px; /* Увеличили с 60px до 85px */
 }
 
-.error-close-btn {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: #991b1b;
-  line-height: 1;
+.reply-btn-top {
+  font-size: 18px; /* Стрелочка ↶ обычно чуть крупнее */
+  font-weight: bold;
 }
 
-/* Остальные стили */
-.comment-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+
+
 .comment-username { font-weight: 700; font-size: 14px; color: #1a1a1b; }
 .comment-email-inline { font-size: 11px; color: #7c7c7c; margin-left: 6px; font-weight: normal; }
 .comment-date { font-size: 12px; color: #787c7e; }
 
-.text-body { font-size: 14px; line-height: 1.5; color: #1a1a1b; word-break: break-word; }
+/* КНОПКИ ВНИЗУ (Ответить / Ответы) */
+.comment-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
 
-.comment-image-preview {
-  max-width: 200px;
-  max-height: 150px;
-  border-radius: 4px;
-  margin-top: 8px;
+.action-btn {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  color: #007bff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 12px;
+  border-radius: 12px;
   cursor: pointer;
-  border: 1px solid #eee;
+}
+
+.action-btn:hover { background: #e9ecef; }
+
+/* ВЕТКИ ОТВЕТОВ */
+.comment-replies-group {
+  margin-top: 4px;
+  /* Можно добавить border-left: 1px solid #eee; для визуальной линии связи */
+}
+
+/* Контейнер для центрирования и позиционирования линии */
+.load-more-container {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+  position: relative;
+}
+
+/* Визуальный "уголок", соединяющий кнопку с веткой */
+.load-more-container::before {
+  content: "";
+  position: absolute;
+  left: -2px;      /* Точка стыковки с левой границей */
+  top: -15px;      /* Тянется вверх к последнему комментарию */
+  width: 15px;
+  height: 28px;
+  border-left: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  border-bottom-left-radius: 8px;
+  pointer-events: none;
+}
+
+/* Сама кнопка в стиле "таблетки" */
+.load-more-replies-btn {
+  margin-left: 20px; /* Отступ, чтобы не налезать на линию */
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  color: #007bff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 5px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.load-more-replies-btn:hover:not(:disabled) {
+  background: #eef5fe;
+  border-color: #007bff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.load-more-replies-btn:disabled {
+  color: #adb5bd;
+  background: #fdfdfd;
+  cursor: wait;
 }

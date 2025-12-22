@@ -26,6 +26,7 @@ export function CommentItem({
   const [isLoading, setIsLoading] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
+  const [isImageOpen, setIsImageOpen] = useState(false);
 
   const canEdit = isAuthenticated && user && user.userName === comment.userName;
   const totalReplies = Number(comment.commentCount || (comment as any).commentCount || 0);
@@ -84,6 +85,25 @@ const handleReplyClick = () => {
             <span className="comment-date">{formatDate(comment.createdAt)}</span>
           </div>
           <div className="comment-content" dangerouslySetInnerHTML={{ __html: comment.content }} />
+          {comment.imageTumbnailUrl && (
+          <div className="comment-image-wrapper">
+            <img 
+              src={comment.imageTumbnailUrl} 
+              className="comment-image-preview" 
+              onClick={() => setIsImageOpen(true)} 
+              alt="attached"
+            />
+          </div>
+        )}
+        {comment.fileUrl && (
+          <div className="comment-file-box">
+            <button className="file-open-btn" onClick={() => window.open(comment.fileUrl ?? undefined, '_blank')}>
+              📎 Файл
+            </button>
+          </div>
+        )}
+
+
           <div className="comment-footer">
             {totalReplies > 0 && (
               <button onClick={handleToggleReplies} className="action-btn">
@@ -129,6 +149,14 @@ const handleReplyClick = () => {
               </button>
             </div>
           )}
+        </div>
+      )}
+      {isImageOpen && (
+        <div className="image-popup-overlay" onClick={() => setIsImageOpen(false)}>
+          <div className="image-popup-content" onClick={(e) => e.stopPropagation()}>
+            <button className="image-popup-close" onClick={() => setIsImageOpen(false)}>&times;</button>
+            <img src={comment.imageUrl || comment.imageTumbnailUrl || ''} className="image-fullsize" alt="" />
+          </div>
         </div>
       )}
     </div>

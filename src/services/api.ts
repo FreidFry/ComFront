@@ -349,7 +349,8 @@ class ApiService {
   }
 
   async getCaptcha(): Promise<{ id: string; imageBase64: string }> {
-    const response = await axios.get(`/api/captcha/generate/?t=${Date.now()}`);
+    const response = await this.client.get(
+      buildApiUrl(`/api/captcha/generate/?t=${Date.now()}`));
     return response.data;
   }
 

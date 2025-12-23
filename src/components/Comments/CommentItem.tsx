@@ -81,7 +81,10 @@ const handleReplyClick = () => {
 
         <div className="comment-main-body">
           <div className="comment-header">
-            <span className="comment-username">{comment.userName}</span>
+            <div className="comment-meta-left">
+              <span className="comment-username">{comment.userName}</span>
+              <span className="comment-email-inline">{comment.email}</span>
+            </div>
             <span className="comment-date">{formatDate(comment.createdAt)}</span>
           </div>
           <div className="comment-content" dangerouslySetInnerHTML={{ __html: comment.content }} />

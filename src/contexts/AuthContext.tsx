@@ -51,12 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const checkAuth = async () => {
     try {
       setIsLoading(true);
-      const response = await apiService.init(); 
       
-      // Если init вернул объект с данными (не пустую строку)
-      if (response && typeof response === 'object' && response.id) {
-        saveUserData(response);
-      } 
       // Если ответ пустой (как в твоих логах), мы не очищаем localStorage,
       // чтобы сохранить сессию, если куки валидны
     } catch (error) {

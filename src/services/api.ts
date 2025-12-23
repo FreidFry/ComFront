@@ -13,7 +13,6 @@ import type {
   ThreadWithCommentsDTO,
   CommentResponseDTO,
   CommonUserDataDTO,
-  AuthInitDTO,
   ApiError,
   PaginatedCommentsDTO,
   CommentTreeDTO,
@@ -220,66 +219,6 @@ class ApiService {
   async logout(): Promise<{ message: string }> {
     const response = await this.client.post(buildApiUrl('/api/auth/logout/'));
     return response.data;
-  }
-
-  async init(): Promise<AuthInitDTO | null> {
-    try {
-      const response = await this.client.get<AuthInitDTO | string>(
-        buildApiUrl('/api/auth/init/')
-      );
-      
-      if (import.meta.env.DEV) {
-        console.log('Init response:', {
-          status: response.status,
-          statusText: response.statusText,
-          data: response.data,
-          headers: response.headers,
-          dataType: typeof response.data,
-          dataString: JSON.stringify(response.data),
-        });
-      }
-      
-      // Если ответ 200 OK с пустым телом - это нормально (данные в cookies)
-      // Не выбрасываем ошибку, возвращаем null
-      if (!response.data || response.data === '' || (typeof response.data === 'string' && response.data.trim() === '')) {
-        if (import.meta.env.DEV) {
-          console.log('Init response is empty (200 OK) - data should be in cookies');
-        }
-        return null;
-      }
-      
-      // Если данные приходят как строка, пытаемся распарсить
-      if (typeof response.data === 'string') {
-        try {
-          return JSON.parse(response.data);
-        } catch (e) {
-          if (import.meta.env.DEV) {
-            console.error('Failed to parse init response as JSON:', e);
-          }
-          return null;
-        }
-      }
-      
-      return response.data as AuthInitDTO;
-    } catch (error: any) {
-      // Если 401, это нормально - пользователь не аутентифицирован
-      if (error.response?.status === 401) {
-        if (import.meta.env.DEV) {
-          console.log('Init returned 401 - user not authenticated');
-        }
-        throw error; // Пробрасываем 401, чтобы фронтенд знал, что пользователь не аутентифицирован
-      }
-      
-      if (import.meta.env.DEV) {
-        console.error('Init error:', {
-          status: error.response?.status,
-          statusText: error.response?.statusText,
-          data: error.response?.data,
-          message: error.message,
-        });
-      }
-      throw error;
-    }
   }
 
   // Thread endpoints

@@ -3,6 +3,7 @@ import { apiService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import type { CommentTreeDTO, PaginatedCommentsDTO } from '../../types/api';
 import { formatDate } from '../../utils/dateFormat';
+import { Link } from 'react-router-dom';
 import './CommentItem.css';
 
 interface CommentItemProps {
@@ -82,8 +83,25 @@ const handleReplyClick = () => {
         <div className="comment-main-body">
           <div className="comment-header">
             <div className="comment-meta-left">
-              <span className="comment-username">{comment.userName}</span>
-              <span className="comment-email-inline">{comment.email}</span>
+              <Link 
+      to={`/profile/${comment.userId || comment.userName}`} 
+      className="comment-author-link"
+    >
+      <div className="comment-avatar-container">
+        {comment.avatarTumbnailUrl ? (
+          <img 
+            src={comment.avatarTumbnailUrl} 
+            alt={comment.userName} 
+            className="comment-avatar" 
+          />
+        ) : (
+          <div className="comment-avatar-placeholder">
+            {comment.userName.charAt(0).toUpperCase()}
+          </div>
+        )}
+      </div>
+      <span className="comment-username">{comment.userName}</span>
+    </Link>            <span className="comment-email-inline">{comment.email}</span>
             </div>
             <span className="comment-date">{formatDate(comment.createdAt)}</span>
           </div>

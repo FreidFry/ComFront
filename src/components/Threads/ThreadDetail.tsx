@@ -116,7 +116,12 @@ export function ThreadDetail() {
         </header>
         
         <div className="thread-info">
-          <span className="author-tag">Автор: <strong>{thread.ownerUserName}</strong></span>
+          <span className="author-tag">Автор: <Link 
+      to={`/profile/${thread.ownerId}`}
+      className="user-link"
+    >
+      <strong>{thread.ownerUserName}</strong>
+    </Link></span>
           <span className="date-tag">{formatDate(thread.createdAt)}</span>
         </div>
 

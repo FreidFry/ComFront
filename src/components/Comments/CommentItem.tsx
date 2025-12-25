@@ -5,11 +5,13 @@ import type { CommentTreeDTO, PaginatedCommentsDTO } from '../../types/api';
 import { formatDate } from '../../utils/dateFormat';
 import { Link } from 'react-router-dom';
 import './CommentItem.css';
+import { CommentForm } from './CommentForm';
 
 interface CommentItemProps {
   comment: CommentTreeDTO;
   depth: number;
   isEditing: boolean;
+  activeReplyId: string | null;
   onReply: (id: string) => void;
   onEdit: (id: string) => void;
   onCancelEdit: () => void;
@@ -18,7 +20,7 @@ interface CommentItemProps {
 }
 
 export function CommentItem({
-  comment, depth, isEditing, onReply, onEdit, onCancelEdit, onDeleted, onUpdated
+  comment, depth, isEditing, activeReplyId, onReply, onEdit, onCancelEdit, onDeleted, onUpdated
 }: CommentItemProps) {
   const { user, isAuthenticated } = useAuth();
   
@@ -61,8 +63,7 @@ export function CommentItem({
   };
 
 const handleReplyClick = () => {
-    onReply(comment.id); // Сообщаем родительскому компоненту ID
-    setIsExpanded(true); // Сразу раскрываем ветку
+    onReply(comment.id);
   };
   return (
     <div className="comment-node">
@@ -137,11 +138,18 @@ const handleReplyClick = () => {
 
       {/* ФОРМА ОТВЕТА (Строго здесь: под родителем, над списком детей) */}
       {isEditing && (
-        <div className="reply-form-mount" style={{ marginLeft: `${(depth + 1) * 20}px` }}>
-          {/* Здесь родительский компонент вставит CommentForm через условие */}
-          <div className="active-form-indicator">Напишите ваш ответ...</div>
-        </div>
-      )}
+  <div className="reply-form-mount" style={{ marginLeft: `${(depth + 1) * 20}px`, marginTop: '10px' }}>
+    <CommentForm 
+      threadId={(comment as any).threadId || ""} // threadId должен быть в объекте комментария
+      parentCommentId={comment.id} 
+      onCommentAdded={() => {
+        onReply("");      // Скрыть форму после успеха
+        onUpdated();    // Обновить список (у вас это вызывает глобальный рефетч)
+      }}
+      onCancel={() => onReply("")} // Кнопка отмены скроет форму
+    />
+  </div>
+)}
 
       {/* СПИСОК СУЩЕСТВУЮЩИХ ОТВЕТОВ */}
       {isExpanded && (
@@ -152,7 +160,8 @@ const handleReplyClick = () => {
                 key={reply.id}
                 comment={reply}
                 depth={depth + 1}
-                isEditing={false}
+                isEditing={activeReplyId === reply.id} 
+                activeReplyId={activeReplyId}
                 onReply={onReply}
                 onEdit={onEdit}
                 onCancelEdit={onCancelEdit}

@@ -16,6 +16,7 @@ import type {
   ApiError,
   PaginatedCommentsDTO,
   CommentTreeDTO,
+  MyNotification,
 } from '../types/api';
 import { buildApiUrl } from '../config/api';
 
@@ -343,6 +344,26 @@ async getThreadComments(
     hasMore: false
   };;
 }
+  // Notification endpoints
+  async getNotifications(): Promise<MyNotification[]> {
+    // Метод GET для получения списка уведомлений из БД
+    const response = await this.client.get<MyNotification[]>(
+      buildApiUrl('/api/notification/')
+    );
+    return response.data;
+  }
+
+  async markAsRead(id: string): Promise<void> {
+    await this.client.patch(
+      buildApiUrl(`/api/notification/${id}/mark-as-read/`)
+    );
+  }
+
+  async markAllAsRead(): Promise<void> {
+    await this.client.patch(
+      buildApiUrl('/api/notification/mark-all-as-read/')
+    );
+  }
 
 async getCommentReplies(commentId: string, after?: string | null): Promise<CommentTreeDTO[]> {
   const params = {

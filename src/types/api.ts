@@ -129,6 +129,25 @@ export interface AuthInitDTO {
   roles: string[] | null;
 }
 
+export interface MyNotification {
+    id: string;
+    title: string;
+    message: string;
+    type: string;
+    threadId: string;
+    commentId: string;
+    CreatorName: string;
+    CreatorAvatarUrl: string;
+    createdAt: string;
+}
+
+export interface NotificationContextType {
+    notifications: MyNotification[];
+    unreadCount: number;
+    markAsRead: (id: string) => Promise<void>;
+    markAllAsRead: () => Promise<void>;
+}
+
 export interface ApiError {
   message?: string;
   errors?: Array<{

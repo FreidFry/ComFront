@@ -9,6 +9,7 @@ import { Register } from './components/Auth/Register';
 import { Profile } from './components/Profile/Profile';
 import { ProfileEdit } from './components/Profile/ProfileEdit';
 import { useAuth } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import './App.css';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -28,35 +29,37 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<ThreadList />} />
-            <Route path="/threads/:id" element={<ThreadDetail />} />
-            <Route
-              path="/threads/new"
-              element={
-                <ProtectedRoute>
-                  <ThreadCreate />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/:id" element={<Profile />} />
-            <Route
-              path="/profile/edit"
-              element={
-                <ProtectedRoute>
-                  <ProfileEdit />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
+      <NotificationProvider>
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<ThreadList />} />
+              <Route path="/threads/:id" element={<ThreadDetail />} />
+              <Route
+                path="/threads/new"
+                element={
+                  <ProtectedRoute>
+                    <ThreadCreate />
+                  </ProtectedRoute>
+                }
+                />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/profile/:id" element={<Profile />} />
+              <Route
+                path="/profile/edit"
+                element={
+                  <ProtectedRoute>
+                    <ProfileEdit />
+                  </ProtectedRoute>
+                }
+                />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

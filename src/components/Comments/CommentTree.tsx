@@ -130,7 +130,8 @@ export function CommentTree({ threadId, initialData, onCommentAdded }: CommentTr
               <CommentItem 
                 comment={comment}
                 depth={0}
-                isEditing={editingComment === comment.id} 
+                isEditing={editingComment === comment.id || replyingTo === comment.id}
+                activeReplyId={replyingTo}
                 onEdit={(id) => setEditingComment(id)} // Передаем ID вверх
                 onCancelEdit={() => setEditingComment(null)}
                 onDeleted={triggerGlobalUpdate}
@@ -140,20 +141,6 @@ export function CommentTree({ threadId, initialData, onCommentAdded }: CommentTr
                 }}
                 onReply={(id) => setReplyingTo(id)} // Передаем ID вверх
               />
-            )}
-            
-            {replyingTo === comment.id && (
-              <div className="reply-form-container">
-                <CommentForm 
-                  threadId={threadId} 
-                  parentCommentId={comment.id} 
-                  onCommentAdded={() => { 
-                    setReplyingTo(null); 
-                    triggerGlobalUpdate(); 
-                  }}
-                  onCancel={() => setReplyingTo(null)}
-                />
-              </div>
             )}
           </div>
         ))}

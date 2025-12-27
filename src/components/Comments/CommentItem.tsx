@@ -25,6 +25,7 @@ export function CommentItem({
   const { user, isAuthenticated } = useAuth();
   
   const [isEditingSelf, setIsEditingSelf] = useState(false);
+  const [isReplying, setIsReplying] = useState(false);
   const [replies, setReplies] = useState<CommentTreeDTO[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,6 +106,7 @@ export function CommentItem({
 
 const handleReplyClick = () => {
     onReply(comment.id);
+    setIsReplying(true);
   };
   return (
     <div className="comment-node">
@@ -175,7 +177,7 @@ const handleReplyClick = () => {
                 <img 
                   src={comment.imageTumbnailUrl} 
                   className="comment-image-preview" 
-                  onClick={() => setIsImageOpen(true)} 
+                  onClick={() => setIsImageOpen(true)}
                   alt="attached"
                 />
               </div>
@@ -200,20 +202,19 @@ const handleReplyClick = () => {
         </div>
       </div>
 
-      {/* ФОРМА ОТВЕТА (Строго здесь: под родителем, над списком детей)
-      {isEditing && (
+      {isReplying && (
   <div className="reply-form-mount" style={{ marginLeft: `${(depth + 1) * 20}px`, marginTop: '10px' }}>
     <CommentForm 
-      threadId={(comment as any).threadId || ""} // threadId должен быть в объекте комментария
-      parentCommentId={comment.id} 
+      threadId={(comment as any).threadId || ""}
+      parentCommentId={comment.id}
       onCommentAdded={() => {
-        onReply("");      // Скрыть форму после успеха
-        onUpdated();    // Обновить список (у вас это вызывает глобальный рефетч)
+        onReply("");
+        onUpdated();
       }}
-      onCancel={() => onReply("")} // Кнопка отмены скроет форму
+      onCancel={() => setIsReplying(false)}
     />
   </div>
-)} */}
+)}
 
       {/* СПИСОК СУЩЕСТВУЮЩИХ ОТВЕТОВ */}
       {isExpanded && (

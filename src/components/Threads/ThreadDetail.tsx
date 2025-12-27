@@ -82,9 +82,9 @@ export function ThreadDetail() {
             <div className="thread-actions-wrapper">
               {!isConfirmingDelete ? (
                 <>
-                  <Link to={`/threads/${thread.id}/edit`} className="edit-link">
+                  <button onClick={() => navigate(`/threads/${thread.id}/edit`)} className="edit-link">
                     ✍️ Редактировать
-                  </Link>
+                  </button>
                   <button 
                     onClick={() => setIsConfirmingDelete(true)} 
                     className="delete-btn-trigger"

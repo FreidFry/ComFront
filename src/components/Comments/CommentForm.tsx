@@ -47,6 +47,14 @@ export function CommentForm({
     }
   };
 
+  const handleRemoveFile = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Сбрасываем значение input
+    }
+  };
+
   const insertTag = (tagName: string) => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -155,9 +163,23 @@ export function CommentForm({
             style={{display: 'none'}} 
             id={`file-${parentCommentId || 'main'}`} 
           />
-          <label htmlFor={`file-${parentCommentId || 'main'}`} className="file-label">
-            {file ? `📎 ${file.name.substring(0, 15)}` : '📎 Файл'}
-          </label>
+          <div className="file-controls">
+            <label htmlFor={`file-${parentCommentId || 'main'}`} className="file-label">
+              {file ? `📎 ${file.name.substring(0, 15)}...` : '📎 Прикрепить файл'}
+            </label>
+            
+            {file && (
+              <button 
+                type="button" 
+                className="remove-file-button" 
+                onClick={handleRemoveFile}
+                title="Удалить файл"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          
         </div>
 
         {/* Блок капчи, появляющийся только после нажатия "Отправить" */}

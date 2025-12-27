@@ -45,7 +45,7 @@ export interface UserUpdateAvatarDTO {
 export interface ThreadsThreeDTOResponce {
   id: string;
   title: string;
-  content: string;
+  context: string;
   createdAt: string;
   commentCount: number;
 }
@@ -115,6 +115,7 @@ export interface CommentTreeProps {
 export interface CommonUserDataDTO {
   id: string;
   userName: string;
+  email:string;
   avatarTumbnailUrl: string;
   createdAt: string;
   homePage: string;

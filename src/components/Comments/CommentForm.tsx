@@ -125,9 +125,24 @@ export function CommentForm({
       
       onCommentAdded();
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Ошибка отправки.';
-      setError(msg);
-      if (!isEditMode) fetchNewCaptcha();
+      let msg = 'Ошибка отправки.';
+
+  if (err.response) {
+    // Сервер ответил с кодом ошибки (4xx, 5xx)
+    const status = err.response.status;
+
+    if (status === 404) {
+      msg = 'Ресурс не найден (404). Проверьте правильность адреса.';
+    } else if (status === 401) {
+      msg = 'Пожалуйста войдите в аккаунт.';
+    } else {
+      msg = err.response.data?.message || msg;
+    }
+  } else if (err.request) {
+    msg = 'Сервер не отвечает. Проверьте интернет-соединение.';
+  }
+
+  setError(msg);
     } finally {
       setIsLoading(false);
     }

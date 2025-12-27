@@ -60,11 +60,9 @@ export function Profile() {
         </div>
         <div className="profile-info">
           <h1>{profile.userName}</h1>
+          <p>{profile.email}</p>
           <div className="profile-meta">
             <span>Зарегистрирован: {formatDate(profile.createdAt)}</span>
-            {profile.lastActive && (
-              <span>Последняя активность: {formatDate(profile.lastActive)}</span>
-            )}
             {profile.homePage && (
               <a href={profile.homePage} target="_blank" rel="noopener noreferrer" className="home-page-link">
                 {profile.homePage}

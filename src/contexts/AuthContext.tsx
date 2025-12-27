@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data && data.id) {
       const userData: CommonUserDataDTO = {
         id: data.id,
+        email: data.email,
         userName: data.userName || 'User',
         avatarTumbnailUrl: data.avatarTumbnailUrl || '',
         createdAt: data.createdAt || '',

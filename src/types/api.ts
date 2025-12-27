@@ -115,7 +115,7 @@ export interface CommentTreeProps {
 export interface CommonUserDataDTO {
   id: string;
   userName: string;
-  email:string;
+  email: string;
   avatarTumbnailUrl: string;
   createdAt: string;
   homePage: string;

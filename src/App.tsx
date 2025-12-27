@@ -11,6 +11,7 @@ import { ProfileEdit } from './components/Profile/ProfileEdit';
 import { useAuth } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext';
 import './App.css';
+import { EditThread } from './components/Threads/EditThread';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -35,6 +36,14 @@ function App() {
             <Routes>
               <Route path="/" element={<ThreadList />} />
               <Route path="/threads/:id" element={<ThreadDetail />} />
+              <Route
+                path="/threads/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditThread />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/threads/new"
                 element={

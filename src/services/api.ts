@@ -275,8 +275,8 @@ class ApiService {
 
   async updateThread(threadId: string, data: ThreadUpdateDTO): Promise<ThreadResponseDTO> {
     const response = await this.client.put<ThreadResponseDTO>(
-      buildApiUrl(`/threads/${threadId}/`),
-      { ...data, threadId }
+      buildApiUrl(`/threads/${threadId}/update`),
+      { threadId, ...data }
     );
     return response.data;
   }

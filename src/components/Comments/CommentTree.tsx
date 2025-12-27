@@ -74,12 +74,12 @@ export function CommentTree({ threadId, initialData, onCommentAdded }: CommentTr
   }, [threadId]);
 
   // Обработка смены сортировки
-  const handleSortChange = (field: SortField) => {
-    const newOrder = sortField === field && sortOrder === 'desc' ? 'asc' : 'desc';
-    setSortField(field);
-    setSortOrder(newOrder);
-    fetchPage(field, newOrder, null, 'refresh');
-  };
+const handleSortChange = (field: SortField) => {
+  const newOrder = sortField === field && sortOrder === 'desc' ? 'asc' : 'desc';
+  setSortField(field);
+  setSortOrder(newOrder);
+  fetchPage(field, newOrder, null, 'refresh');
+};
 
   // Метод для полного обновления через родителя (смена key)
   const triggerGlobalUpdate = () => {

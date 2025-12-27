@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { apiService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import type { CommentTreeDTO, PaginatedCommentsDTO } from '../../types/api';
+import type { CommentTreeDTO, CommentUpdateDTO, PaginatedCommentsDTO } from '../../types/api';
 import { formatDate } from '../../utils/dateFormat';
 import { Link } from 'react-router-dom';
 import './CommentItem.css';
@@ -15,21 +15,23 @@ interface CommentItemProps {
   onReply: (id: string) => void;
   onEdit: (id: string) => void;
   onCancelEdit: () => void;
-  onDeleted: () => void;
+  onDeleted: (id: string) => void;
   onUpdated: () => void;
 }
 
 export function CommentItem({
-  comment, depth, isEditing, activeReplyId, onReply, onEdit, onCancelEdit, onDeleted, onUpdated
+  comment, depth, activeReplyId, onReply, onEdit, onCancelEdit, onDeleted, onUpdated
 }: CommentItemProps) {
   const { user, isAuthenticated } = useAuth();
   
+  const [isEditingSelf, setIsEditingSelf] = useState(false);
   const [replies, setReplies] = useState<CommentTreeDTO[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
+  const [currentContent, setCurrentContent] = useState(comment.content);
 
   const canEdit = isAuthenticated && user && user.userName === comment.userName;
   const totalReplies = Number(comment.commentCount || (comment as any).commentCount || 0);
@@ -53,6 +55,22 @@ export function CommentItem({
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm("Удалить этот комментарий?")) return;
+
+    try {
+      setIsLoading(true);
+      await apiService.deleteComment(comment.id);
+      
+      onDeleted(comment.id); 
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Ошибка при удалении");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleToggleReplies = () => {
     if (isExpanded) {
       setIsExpanded(false);
@@ -61,6 +79,29 @@ export function CommentItem({
       setIsExpanded(true);
     }
   };
+
+  const handleUpdate = async (newContent: string) => {
+  try {
+    setIsLoading(true);
+    const updateData: CommentUpdateDTO = {
+      commentId: comment.id,
+      content: newContent,
+      imageUrl: comment.imageUrl
+    };
+
+    const updatedCommentFromServer = await apiService.updateComment(comment.id, updateData);
+    
+    setCurrentContent(newContent); // Обновляем текст на экране
+    setIsEditingSelf(false);
+    setCurrentContent(updatedCommentFromServer.content);
+    onUpdated();
+  } catch (err) {
+    console.error("Update failed:", err);
+    onUpdated();
+  } finally {
+    setIsLoading(false);
+  }
+};
 
 const handleReplyClick = () => {
     onReply(comment.id);
@@ -75,8 +116,8 @@ const handleReplyClick = () => {
           )}
           {canEdit && (
             <>
-              <button onClick={() => onEdit(comment.id)} className="icon-btn edit-btn">✎</button>
-              <button onClick={onDeleted} className="icon-btn delete-btn">✖</button>
+              <button onClick={() => setIsEditingSelf(true)} className="icon-btn edit-btn">✎</button>
+              <button onClick={handleDelete} className="icon-btn delete-btn">✖</button>
             </>
           )}
         </div>
@@ -106,17 +147,6 @@ const handleReplyClick = () => {
             </div>
             <span className="comment-date">{formatDate(comment.createdAt)}</span>
           </div>
-          <div className="comment-content" dangerouslySetInnerHTML={{ __html: comment.content }} />
-          {comment.imageTumbnailUrl && (
-          <div className="comment-image-wrapper">
-            <img 
-              src={comment.imageTumbnailUrl} 
-              className="comment-image-preview" 
-              onClick={() => setIsImageOpen(true)} 
-              alt="attached"
-            />
-          </div>
-        )}
         {comment.fileUrl && (
           <div className="comment-file-box">
             <button className="file-open-btn" onClick={() => window.open(comment.fileUrl ?? undefined, '_blank')}>
@@ -124,7 +154,41 @@ const handleReplyClick = () => {
             </button>
           </div>
         )}
-
+{isEditingSelf ? (
+          <div className="edit-form-mount" style={{ marginTop: '10px' }}>
+            <CommentForm
+              initialContent={comment.content}
+              parentCommentId={comment.id}
+              threadId={(comment as any).threadId}
+              onCommentAdded={(newText?: string) => {
+                handleUpdate(newText!);
+                setIsEditingSelf(false);
+              }}
+              onCancel={() => setIsEditingSelf(false)}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="comment-content" dangerouslySetInnerHTML={{ __html: currentContent }} />
+            {comment.imageTumbnailUrl && (
+              <div className="comment-image-wrapper">
+                <img 
+                  src={comment.imageTumbnailUrl} 
+                  className="comment-image-preview" 
+                  onClick={() => setIsImageOpen(true)} 
+                  alt="attached"
+                />
+              </div>
+            )}
+            {comment.fileUrl && (
+              <div className="comment-file-box">
+                <button className="file-open-btn" onClick={() => window.open(comment.fileUrl ?? undefined, '_blank')}>
+                  📎 Файл
+                </button>
+              </div>
+            )}
+          </>
+        )}
 
           <div className="comment-footer">
             {totalReplies > 0 && (
@@ -136,7 +200,7 @@ const handleReplyClick = () => {
         </div>
       </div>
 
-      {/* ФОРМА ОТВЕТА (Строго здесь: под родителем, над списком детей) */}
+      {/* ФОРМА ОТВЕТА (Строго здесь: под родителем, над списком детей)
       {isEditing && (
   <div className="reply-form-mount" style={{ marginLeft: `${(depth + 1) * 20}px`, marginTop: '10px' }}>
     <CommentForm 
@@ -149,7 +213,7 @@ const handleReplyClick = () => {
       onCancel={() => onReply("")} // Кнопка отмены скроет форму
     />
   </div>
-)}
+)} */}
 
       {/* СПИСОК СУЩЕСТВУЮЩИХ ОТВЕТОВ */}
       {isExpanded && (

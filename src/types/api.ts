@@ -18,7 +18,6 @@ export interface ThreadCreateDTO {
 }
 
 export interface ThreadUpdateDTO {
-  threadId: string;
   title: string;
   context: string;
 }

@@ -5,7 +5,7 @@ import './CommentForm.css';
 interface CommentFormProps {
   threadId: string;
   parentCommentId?: string | null;
-  onCommentAdded: () => void;
+  onCommentAdded: (content?: string) => void;
   onCancel?: () => void;
   initialContent?: string;
 }
@@ -73,8 +73,10 @@ export function CommentForm({
     e.preventDefault();
     setError(null);
 
+    const isEditMode = initialContent !== '';
+
     // ШАГ 1: Если капча еще не показана — запрашиваем её
-    if (!showCaptcha) {
+    if (!isEditMode && !showCaptcha) {
       setIsLoading(true);
       await fetchNewCaptcha();
       setIsLoading(false);
@@ -82,7 +84,7 @@ export function CommentForm({
     }
 
     // ШАГ 2: Валидация ввода капчи
-    if (!captchaInput.trim()) {
+    if (showCaptcha && !captchaInput.trim()) {
       setError('Введите код с картинки');
       return;
     }
@@ -90,27 +92,34 @@ export function CommentForm({
     // ШАГ 3: Финальная отправка
     setIsLoading(true);
     try {
-      await apiService.createComment({
-        content: content.trim(),
-        threadId,
-        parentCommentId,
-        formFile: file ?? undefined,
-        captchaId,
-        captchaValue: captchaInput.trim()
-      });
+      if (isEditMode) {
+        await apiService.updateComment(parentCommentId!, {
+          commentId: parentCommentId!,
+          content: content.trim(),
+        });
+      } else {
+        await apiService.createComment({
+          content: content.trim(),
+          threadId,
+          parentCommentId,
+          formFile: file ?? undefined,
+          captchaId,
+          captchaValue: captchaInput.trim()
+        });
+      }
 
-      // Очистка формы
-      setContent('');
-      setFile(null);
-      setCaptchaInput('');
-      setCaptchaId('');
-      setShowCaptcha(false);
+      if (!isEditMode) {
+        setContent('');
+        setFile(null);
+        setCaptchaInput('');
+        setShowCaptcha(false);
+      }
+      
       onCommentAdded();
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Ошибка отправки. Проверьте код капчи.';
+      const msg = err.response?.data?.message || 'Ошибка отправки.';
       setError(msg);
-      // При ошибке всегда обновляем капчу
-      fetchNewCaptcha();
+      if (!isEditMode) fetchNewCaptcha();
     } finally {
       setIsLoading(false);
     }

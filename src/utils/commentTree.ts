@@ -30,24 +30,7 @@ export function buildCommentTree(comments: CommentResponseDTO[] | undefined | nu
     } else {
       rootComments.push(commentNode);
     }
-  });
-
-  // Сортируем комментарии по дате создания
-  const sortByDate = (a: CommentTreeDTO, b: CommentTreeDTO) => {
-    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-  };
-
-  const sortTree = (nodes: CommentTreeDTO[]) => {
-    nodes.sort(sortByDate);
-    nodes.forEach((node) => {
-      if (node.replies.length > 0) {
-        sortTree(node.replies);
-      }
-    });
-  };
-
-  sortTree(rootComments);
-
+  });  
   return rootComments;
 }
 
